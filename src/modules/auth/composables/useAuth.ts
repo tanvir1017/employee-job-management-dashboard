@@ -18,9 +18,9 @@ export const useAuth = () => {
 
     // login function
     const loginUser = async (payload: LoginPayload) => {
-        const user = await login(payload)
-        authStore.setUser(user)
-        return user;
+        const response = await login(payload)
+        authStore.setAuth(response.user, response.token)
+        return response;
     }
 
     return {

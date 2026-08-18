@@ -1,6 +1,6 @@
-import { users } from "@/mocks/database";
+import { type MockUser, users } from "@/mocks/database";
 import { delay } from "@/mocks/delay";
-import type { LoginPayload, RegisterPayload, User } from "../types";
+import type { AuthResponse, LoginPayload, RegisterPayload } from "../types";
 
 export const register = async (payload: RegisterPayload) => {
 
@@ -14,31 +14,52 @@ export const register = async (payload: RegisterPayload) => {
         throw new Error('User already exists')
     }
 
-    const newUser: User = {
+    const newUser: MockUser = {
         id: crypto.randomUUID(),
         name: payload.name,
-        email: payload.email
+        email: payload.email,
+        password: payload.password
     }
     users.push(newUser)
     return newUser
 }
 
-export const login = async (payload: LoginPayload) => {
-    // making some fake delay to simulate a real API call
+
+
+export async function login(
+    payload: LoginPayload
+): Promise<AuthResponse> {
+
     await delay()
 
-    // check is user is exist or not
-    const isUserExist = users.find(user => user.email === payload.email)
+
+    const user: MockUser | undefined = users.find(
+        user => user.email === payload.email
+    )
 
 
-    if (!isUserExist) {
-        throw new Error('User does not exist')
+    if (!user) {
+        throw new Error(
+            'Invalid email or password'
+        )
     }
 
-    // check if password is correct
-    if (payload.password !== 'password') {
-        throw new Error('Invalid credentials')
+
+    if (user.password !== payload.password) {
+        throw new Error(
+            'Invalid email or password'
+        )
     }
 
-    return isUserExist;
+
+    return {
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email
+        },
+
+        token: crypto.randomUUID()
+    }
+
 }

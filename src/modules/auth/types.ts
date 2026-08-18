@@ -17,3 +17,8 @@ export interface LoginPayload {
     password: string
 }
 
+export interface AuthResponse {
+    user: User
+    token: string
+}
+
