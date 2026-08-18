@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
@@ -27,6 +27,13 @@ const [email] = defineField('email')
 
 const [password] = defineField('password')
 
+onMounted(() => {
+  console.log('Register form mounted')
+})
+
+
+
+
 const onSubmit = handleSubmit(async (values) => {
   try {
     loading.value = true
@@ -35,7 +42,6 @@ const onSubmit = handleSubmit(async (values) => {
 
     const user = await registerUser(values)
 
-    console.log('Registered:', user)
     router.push('/auth/login')
   } catch (error) {
     submitError.value = error instanceof Error ? error.message : 'Something went wrong'

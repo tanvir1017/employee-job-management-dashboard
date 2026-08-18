@@ -5,6 +5,7 @@ import type { LoginPayload, RegisterPayload } from "../types"
 export const useAuth = () => {
     const authStore = useAuthStore()
 
+
     const registerUser = async (payload: RegisterPayload) => {
 
         // call the register API
