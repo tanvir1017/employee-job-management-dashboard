@@ -1,8 +1,13 @@
 <script setup lang="ts">
+import { useAuth } from '@/modules/auth/composables/useAuth'
+import { useAuthStore } from '@/modules/auth/stores/auth.store'
 import { LogOut, PanelLeft } from '@lucide/vue'
 import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 const sidebarOpen = ref(true)
+const { logout } = useAuth()
+const { isAuthenticated } = useAuthStore()
+const router = useRouter()
 
 const sidebarNav = [
   {
@@ -20,6 +25,11 @@ const sidebarNav = [
     isNew: false,
   },
 ]
+
+const handleLogout = () => {
+  logout()
+  router.push('/auth/login')
+}
 </script>
 
 <template>
@@ -49,7 +59,8 @@ const sidebarNav = [
         </button>
 
         <button
-          @click="sidebarOpen = !sidebarOpen"
+          @click="handleLogout"
+          v-if="isAuthenticated"
           class="flex items-center gap-0.5 mb-4 rounded bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300 cursor-pointer"
         >
           <LogOut class="rotate-180 mr-3 size-4" /> Logout

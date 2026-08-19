@@ -17,6 +17,8 @@ export const useAuth = () => {
         return user;
     }
 
+
+
     // login function
     const loginUser = async (payload: LoginPayload) => {
         const response = await login(payload)
@@ -24,9 +26,14 @@ export const useAuth = () => {
         return response;
     }
 
+    const logout = async () => {
+        authStore.logout()
+    }
+
     return {
         registerUser,
-        loginUser
+        loginUser,
+        logout
     }
 
 }
