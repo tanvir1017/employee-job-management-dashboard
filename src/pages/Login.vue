@@ -1,57 +1,93 @@
 <script setup lang="ts">
-import AppButton from '@/components/shared/AppButton.vue'
-import AppInput from '@/components/shared/AppInput.vue'
+import { useAuth } from '@/modules/auth/composables/useAuth'
+import { loginSchema } from '@/modules/auth/schemas/auth.schema'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
 import { ref } from 'vue'
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
+import { useRouter } from 'vue-router'
+
 const loading = ref(false)
 
-function login() {
-  loading.value = true
-  if (password.value !== confirmPassword.value) {
-    console.log('Passwords do not match!')
-    loading.value = false
-    return
-  } else {
-    console.log({
-      email: email.value,
-      password: password.value,
+const submitError = ref('')
+
+const { loginUser } = useAuth()
+
+const { defineField, errors, handleSubmit } = useForm({
+  validationSchema: toTypedSchema(loginSchema),
+})
+
+const [email] = defineField('email')
+const [password] = defineField('password')
+
+const router = useRouter()
+
+const handleLogin = handleSubmit(async (values) => {
+  try {
+    ;((loading.value = true), (submitError.value = ''))
+    const login = await loginUser({
+      email: values.email,
+      password: values.password,
     })
+
+    console.log('Logged in:', login)
+
+    router.push('/dashboard')
+  } catch (error) {
+    submitError.value = error instanceof Error ? error.message : 'Something went wrong'
+  } finally {
     loading.value = false
   }
-}
+})
 </script>
 
 <template>
-  <div
-    :class="{
-      'form-value  p-4 mb-4 rounded bg-gray-300':
-        email.length > 0 || password.length > 0 || confirmPassword.length > 0,
-    }"
-  >
-    <p v-if="email.length > 0"><strong>Email:</strong> {{ email }} <br /></p>
+  <form @submit.prevent="handleLogin" class="space-y-4">
+    <div>
+      <label> Email </label>
+      <input
+        v-model="email"
+        type="email"
+        placeholder="Email"
+        required
+        class="w-full rounded border p-2"
+      />
+      <p class="text-red-500">
+        {{ errors.email }}
+      </p>
+    </div>
 
-    <p v-if="password.length > 0"><strong>Password:</strong> {{ password }} <br /></p>
+    <div>
+      <label> Password </label>
+      <input
+        v-model="password"
+        type="password"
+        placeholder="Password"
+        required
+        class="w-full rounded border p-2"
+      />
 
-    <p v-if="confirmPassword.length > 0">
-      <strong>Confirm Password:</strong> {{ confirmPassword }} <br />
+      <p class="text-red-500">
+        {{ errors.password }}
+      </p>
+    </div>
+
+    <p v-if="submitError" class="text-red-600">
+      {{ submitError }}
+    </p>
+
+    <button
+      :disabled="loading"
+      type="submit"
+      class="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer"
+    >
+      {{ loading ? 'Logging in...' : 'Login' }}
+    </button>
+  </form>
+
+  <div>
+    <p class="mt-4 text-center">
+      Don't have an account?
+      <router-link to="/auth/register" class="text-blue-600 hover:underline">Register</router-link>
     </p>
   </div>
-
-  <form @submit.prevent="login" class="space-y-4">
-    <AppInput label="Email" v-model="email" type="email" placeholder="Email" required />
-
-    <AppInput v-model="password" label="Password" type="password" placeholder="Password" required />
-
-    <AppInput
-      label="Confirm Password"
-      v-model="confirmPassword"
-      type="password"
-      placeholder="Confirm Password"
-      required
-    />
-
-    <AppButton type="submit" variant="danger" :loading="loading"> Login </AppButton>
-  </form>
 </template>
