@@ -23,7 +23,6 @@ const router = useRouter()
 
 const handleLogin = handleSubmit(async (values) => {
   try {
-    ;((loading.value = true), (submitError.value = ''))
     const login = await loginUser({
       email: values.email,
       password: values.password,

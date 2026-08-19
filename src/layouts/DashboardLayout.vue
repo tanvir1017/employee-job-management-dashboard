@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PanelLeft } from '@lucide/vue'
+import { LogOut, PanelLeft } from '@lucide/vue'
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 const sidebarOpen = ref(true)
@@ -40,12 +40,21 @@ const sidebarNav = [
     </aside>
 
     <main :class="sidebarOpen ? 'ml-64' : ''" class="p-6">
-      <button
-        @click="sidebarOpen = !sidebarOpen"
-        class="flex items-center gap-0.5 mb-4 rounded bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300 cursor-pointer"
-      >
-        <PanelLeft /> Sidebar
-      </button>
+      <div class="flex items-center justify-between">
+        <button
+          @click="sidebarOpen = !sidebarOpen"
+          class="flex items-center gap-0.5 mb-4 rounded bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300 cursor-pointer"
+        >
+          <PanelLeft /> Sidebar
+        </button>
+
+        <button
+          @click="sidebarOpen = !sidebarOpen"
+          class="flex items-center gap-0.5 mb-4 rounded bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300 cursor-pointer"
+        >
+          <LogOut class="rotate-180 mr-3 size-4" /> Logout
+        </button>
+      </div>
 
       <RouterView />
     </main>
