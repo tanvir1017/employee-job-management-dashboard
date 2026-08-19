@@ -2,6 +2,7 @@
 import AppButton from '@/components/shared/AppButton.vue'
 import AppCard from '@/components/shared/AppCard.vue'
 import { useEmployees } from '@/modules/employees/composables/useEmployees'
+import { useModalStore } from '@/stores/modal.store'
 import { Pencil, Trash } from '@lucide/vue'
 
 const {
@@ -12,6 +13,20 @@ const {
 const handleDeleteEmployee = (employeeId: string) => {
   deleteEmployeeMutation.mutate({
     id: employeeId,
+  })
+}
+
+const modalStore = useModalStore()
+
+function confirmDelete(id: string) {
+  modalStore.openModal({
+    title: 'Are you sure you want to delete this employee?',
+    message: 'This action cannot be undone.',
+
+    onConfirm() {
+      handleDeleteEmployee(id)
+      modalStore.closeModal()
+    },
   })
 }
 </script>
@@ -33,7 +48,7 @@ const handleDeleteEmployee = (employeeId: string) => {
 
   <div v-else>
     <h1 class="text-4xl font-semibold mb-3">Employees</h1>
-    <div class="grid grid-cols-2 gap-1">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-1">
       <AppCard v-for="employee in employees" :key="employee.id" class="border border-gray-400/70">
         <h2>{{ employee.name }}</h2>
         <p>Email: {{ employee.email }}</p>
@@ -41,7 +56,7 @@ const handleDeleteEmployee = (employeeId: string) => {
         <p>Position: {{ employee.role }}</p>
         <div class="mt-5 flex items-center justify-end gap-1.5">
           <AppButton
-            @click="handleDeleteEmployee(employee.id)"
+            @click="confirmDelete(employee.id)"
             variant="danger"
             :disabled="isFetching || isLoading"
             class="cursor-pointer mt-2 flex items-center space-x-2"
